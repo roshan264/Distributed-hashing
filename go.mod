@@ -1,3 +1,3 @@
-module github.com/roshan264/Distributed-Hashing
+module distributed-hashing
 
 go 1.24.0

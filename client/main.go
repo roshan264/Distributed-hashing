@@ -16,7 +16,7 @@ delete key same as above.*/
 package main
 
 import(
-	"github.com/roshan264/Distrubuted-Hashing/util/hashring"
+	"distributed-hashing/util/hashring"
 	"fmt"
 )
 
@@ -28,6 +28,17 @@ var nodeTourlMaps = map[string]string{
 }
 
 func main(){
-	ring = hashring.createNewHashRing()
-	fmt.Println("ring %v", ring)
+
+	ring = hashring.CreateNewHashRing()
+	
+	for nodeName := range nodeTourlMaps{
+		ring.AddNode(nodeName)
+	}
+
+	keys := []string{"roshan", "shinde", "okboss"}
+
+	for _, nodeName:= range keys{
+		node := ring.GetNode(nodeName)
+		fmt.Printf("Node:%v for key:%v", node, nodeName)
+	}
 }

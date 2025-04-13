@@ -20,7 +20,7 @@ import(
 	"strconv"
 	"crypto/sha256"
 )
-int virtualNodes = 100
+var virtualNodes int = 100
 
 type HashRing struct{
 	nodes map[uint64]string 
@@ -28,29 +28,29 @@ type HashRing struct{
 	mutex sync.RWMutex
 }
 
-func createNewHashRing() *HashRing{
+func CreateNewHashRing() *HashRing{
 	hashRing := HashRing{
-		nodes: make(map[uint64]string)
-		sortedHashes: make([]uint64, 0)
+		nodes: make(map[uint64]string),
+		sortedHashes: make([]uint64, 0),
 	}
 	return &hashRing
 }
 
-func convertKeyToHash(key string){
+func ConvertKeyToHash(key string) uint64{
 	sum := sha256.Sum256([]byte(key))
 	return uint64(sum[0])<<56 | uint64(sum[1])<<48 | uint64(sum[2])<<40 | uint64(sum[3])<<32 |
 		uint64(sum[4])<<24 | uint64(sum[5])<<16 | uint64(sum[6])<<8 | uint64(sum[7])
 }
 
 
-func (h *HashRing) addNode(nodeName string){
+func (h *HashRing) AddNode(nodeName string){
 
 	h.mutex.Lock()
-	defer h.mutex.UnLock()
+	defer h.mutex.Unlock()
 
 	for i := 0 ; i <= virtualNodes ; i++{
-		virtualNodeId := nodeName + "_" + i
-		hashKeyOfVirtualNode := hashKey(virtualNodeId)
+		virtualNodeId := nodeName + "_" + strconv.Itoa(i)
+		hashKeyOfVirtualNode := ConvertKeyToHash(virtualNodeId)
 		h.nodes[hashKeyOfVirtualNode] = nodeName
 		h.sortedHashes = append(h.sortedHashes, hashKeyOfVirtualNode)
 	}
@@ -61,11 +61,8 @@ func (h *HashRing) addNode(nodeName string){
 
 }
 
-func FindTargetedNodeHash(sortedHashes uint64[], hashKey uint64){
+func FindTargetedNodeHash(sortedHashes []uint64, hashKey uint64) uint64 {
 	length := len(sortedHashes)
-	if length == 0{
-		return ""
-	}
 	if length == 1{
 		return sortedHashes[0]
 	}
@@ -77,7 +74,7 @@ func FindTargetedNodeHash(sortedHashes uint64[], hashKey uint64){
 	for left <= right {
 		mid := left + (right - left) / 2
 
-		if arr[mid] <= key {
+		if sortedHashes[mid] <= hashKey {
 			left = mid + 1
 		}else{
 			right = mid - 1
@@ -85,28 +82,26 @@ func FindTargetedNodeHash(sortedHashes uint64[], hashKey uint64){
 	}
 
 	if left < length{
-		return arr[left]
+		return sortedHashes[left]
 	}
 
-	return arr[0]
+	return sortedHashes[0]
 	
 }
-func (h *HashRing) getNode(key string) string{
-	h.mutex.Rlock()
+func (h *HashRing) GetNode(key string) string{
+	h.mutex.RLock()
 	defer h.mutex.RUnlock()
 
 	if len(h.sortedHashes) == 0{
 		return ""
 	}
 
-	hashKey = convertKeyToHash(key)
+	hashKey := ConvertKeyToHash(key)
 
-	targetedHash = FindTargetedNodeHash(h.sortedHashes, hashKey)
+	targetedHash := FindTargetedNodeHash(h.sortedHashes, hashKey)
 
-	if targetedHash != ""{
-		return h.nodes[targetedHash]
-	}
+	
+	return h.nodes[targetedHash]
 
-	return ""
 }
 
