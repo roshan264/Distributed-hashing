@@ -18,6 +18,12 @@ package main
 import(
 	"distributed-hashing/util/hashring"
 	"fmt"
+	"strconv"
+	"sync"
+	"encoding/json"
+	"net/http"
+	"bytes"
+	"io"
 )
 
 var ring *hashring.HashRing
@@ -27,6 +33,10 @@ var nodeTourlMaps = map[string]string{
 	"hypervm-3":"http://localhost:9003",
 }
 
+type keyValRequest struct {
+	Key   string `json:"key"`
+	Value string `json:"value",omitempty`
+}
 
 func main(){
 
@@ -36,13 +46,54 @@ func main(){
 		ring.AddNode(nodeName)
 	}
 
+	var wg sync.WaitGroup
+
+	for i := 1 ; i < 21 ; i++ {
+		wg.Add(1)
+		setKeyGoRountine := func(i int){
+			defer wg.Done()
+			key := "key" + strconv.Itoa(i)
+			value := "value" + strconv.Itoa(i)
+			err := setKeyValue(key, value)
+
+			if err == nil {
+				fmt.Printf("Saved: key:%v", key)
+			}
+		}
+
+		go setKeyGoRountine (i)
+		
+	}
+
+	wg.Wait()
+
+	for i := 1 ; i < 21 ; i++ {
+		wg.Add(1)
+		getKeyGoRountine := func(i int){
+			defer wg.Done()
+			key := "key" + strconv.Itoa(i)
+			value, err := getValue(key)
+
+			if err == nil {
+				fmt.Printf("Got it-> key %v : value %v", key, value)
+			}else{
+				fmt.Printf("Error while fetchin value for %v : %v", key, err)
+			}
+		}
+
+		go getKeyGoRountine (i)
+		
+	}
+
+	wg.Wait()
+
 }
 
-func setKeyValue(key string, value string){
-	node := ring.Getnode(key)
+func setKeyValue(key string, value string) error {
+	node := ring.GetNode(key)
 	nodeUrl := nodeTourlMaps[node] + "/set"
 
-	kv := kvRequest{Key: key, Value: value}
+	kv := keyValRequest{Key: key, Value: value}
 	data, err := json.Marshal(kv)
 	if err != nil {
 		return err
@@ -57,18 +108,19 @@ func setKeyValue(key string, value string){
 	return nil
 }
 
-func getValue(key string) string{
-	node := ring.Getnode(key)
+func getValue(key string) (string, error){
+	node := ring.GetNode(key)
 	nodeUrl := nodeTourlMaps[node] + "/get?key=" + key
-	resp, err := https.Get(url)
+	resp, err := http.Get(nodeUrl)
 	if err != nil {
-		return err
+		return "", err
 	}
 	fmt.Printf("Response for store key:%v  is %v", key, resp)
 
 	defer resp.Body.Close()
 
 	body, _ := io.ReadAll(resp.Body)
-	return string(body)
+	fmt.Printf("getValue Body: %v", body)
+	return string(body), nil
 }
 

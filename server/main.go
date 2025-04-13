@@ -24,6 +24,7 @@ type keyValRequest struct {
 }
 
 func main(){
+	fmt.Printf("roshan")
 	http.HandleFunc("/set", handleSet)
 	http.HandleFunc("/get", handleGet)
 
@@ -32,6 +33,8 @@ func main(){
 		port = os.Args[1]
 	} 
 	address := ":" + port
+	fmt.Printf("Listening on address: %v", address)
+
 	log.Fatal(http.ListenAndServe(address, nil))
 }
 
