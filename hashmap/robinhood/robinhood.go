@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"hash/fnv"
 	"encoding/json"
+	"sync"
 )
 type entry struct {
 	Key string
@@ -17,6 +18,7 @@ type HashMap struct{
 	table    []*entry
 	size int 
 	loadFactor float64
+	mutex sync.RWMutex
 }
 
 func CreateNewHashMap(maxLoadFactor float64, defaultCapacity int) *HashMap{
@@ -34,11 +36,7 @@ func hash(key string) uint32 {
 	return h.Sum32()
 }
 
-func (h *HashMap) Put(key string, value interface{}) error{
-	if float64(h.size + 1) / float64(len(h.table)) > h.loadFactor {
-		h.resize()
-	}
-
+func (h *HashMap) putInternal(key string, value interface{}) error{
 	valueBytes, err := json.Marshal(value)
 
 	if err != nil{
@@ -75,9 +73,22 @@ func (h *HashMap) Put(key string, value interface{}) error{
 		
 	}
 	return nil
+
+}
+func (h *HashMap) Put(key string, value interface{}) error{
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
+	if float64(h.size + 1) / float64(len(h.table)) > h.loadFactor {
+		h.resize()
+	}
+
+	return h.putInternal(key, value)
 }
 
 func (h *HashMap) Get(key string) ([]byte, error){
+	h.mutex.RLock()
+	defer h.mutex.RUnlock()
+
 	hashVal := hash(key)
 	ind := int(hashVal) %  len(h.table) 
 	
@@ -107,6 +118,8 @@ func (h *HashMap) Get(key string) ([]byte, error){
 
 
 func (h *HashMap) Delete(key string) error {
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
 	hashVal := hash(key)
 	ind := int(hashVal) %  len(h.table) 
 	
@@ -140,6 +153,7 @@ func (h *HashMap) Delete(key string) error {
 }
 
 func (h *HashMap) resize() {
+	//This function also needs lock. But we are calling this from Put only. And put already has lock. So not locking here.
 	newCapacity := len(h.table) * 2
 	newTable := make([]*entry, newCapacity)
 
@@ -151,7 +165,7 @@ func (h *HashMap) resize() {
 		if row != nil && !row.Tombstone {
 			var val interface{}
 			json.Unmarshal(row.Value, &val)
-			h.Put(row.Key, val)
+			h.putInternal(row.Key, val)
 		}
 	}
 }
