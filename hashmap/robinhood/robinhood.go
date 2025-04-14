@@ -144,11 +144,10 @@ func (h *HashMap) resize() {
 	h.size = 0
 	for _, row := range oldTable {
 
-		if row != nil {
+		if row != nil && !row.Tombstone {
 			var val interface{}
 			json.Unmarshal(row.Value, &val)
 			h.Put(row.Key, val)
 		}
 	}
 }
-

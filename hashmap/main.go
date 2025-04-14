@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"encoding/json"
 	"strconv"
 
 	"distributed-hashing/hashmap/robinhood"
@@ -20,7 +19,7 @@ func main() {
 	hm := robinhood.CreateNewHashMap(0.75, 16)
 
 	// Test data for Put and Get operations
-	for i := 0 ; i < 29 ; i++{
+	for i := 0 ; i < 38 ; i++{
 		
 		name := "Roshan" + strconv.Itoa(i)
 		age := i 
@@ -32,7 +31,7 @@ func main() {
 		}
 	}
 
-	for i := 0 ; i < 29 ; i++{
+	for i := 0 ; i < 38 ; i++{
 
 		name := "Roshan" + strconv.Itoa(i)
 
