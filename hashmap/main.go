@@ -42,6 +42,26 @@ func main() {
 		fmt.Printf("without marshal: key: %v value: %+v\n", name, string(data))
 	}
 
+	for i := 0 ; i < 18 ; i = i + 3{
+
+		name := "Roshan" + strconv.Itoa(i)
+
+		err := hm.Delete(name)
+		if err != nil {
+			fmt.Printf("Error while deleing %v : %v", name, err)
+		}
+	}
+
+	for i := 0 ; i < 18 ; i++{
+
+		name := "Roshan" + strconv.Itoa(i)
+
+		data, err := hm.Get(name)
+		if err != nil {
+			fmt.Printf("Error while fetchi %v : %v", name, err)
+		}
+		fmt.Printf("without marshal: key: %v value: %+v\n", name, string(data))
+	}
 
 
 	data, err := hm.Get("user1")

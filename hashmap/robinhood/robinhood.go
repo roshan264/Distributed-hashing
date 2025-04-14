@@ -110,10 +110,11 @@ func (h *HashMap) Delete(key string) error {
 	hashVal := hash(key)
 	ind := int(hashVal) %  len(h.table) 
 	
-	curr := h.table[ind]
+	
 	dist := 0
 
 	for{
+		curr := h.table[ind]
 		if curr == nil{
 			err := fmt.Errorf("key %v not found", key)
 			return err
@@ -134,6 +135,7 @@ func (h *HashMap) Delete(key string) error {
 		ind = (ind + 1 ) % len(h.table)
 	}
 
+	return nil
 
 }
 
