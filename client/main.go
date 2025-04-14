@@ -24,9 +24,12 @@ import(
 	"net/http"
 	"bytes"
 	"io"
+	"distributed-hashing/util/logger"
 )
 
 var ring *hashring.HashRing
+var log = logger.InitLogger("/Users/StartupUser/Desktop/roshan-coding/log/client.log")
+
 var nodeTourlMaps = map[string]string{
 	"hypervm-1":"http://localhost:9001",
 	"hypervm-2":"http://localhost:9002",
@@ -57,7 +60,9 @@ func main(){
 			err := setKeyValue(key, value)
 
 			if err == nil {
-				fmt.Printf("Saved: key:%v", key)
+				log.Info("Saved: ", "key", key)
+			}else{
+				log.Error(err, "Could not store key")
 			}
 		}
 
@@ -75,9 +80,9 @@ func main(){
 			value, err := getValue(key)
 
 			if err == nil {
-				fmt.Printf("Got it-> key %v : value %v", key, value)
+				log.Info("Got it->", "key", key , "value", value)
 			}else{
-				fmt.Printf("Error while fetchin value for %v : %v", key, err)
+				log.Error(err, "Problem while fetching ", "key", key)
 			}
 		}
 
@@ -96,31 +101,39 @@ func setKeyValue(key string, value string) error {
 	kv := keyValRequest{Key: key, Value: value}
 	data, err := json.Marshal(kv)
 	if err != nil {
+		log.Error(err, "Failed to convert keyValRequest to json")
 		return err
 	}
-
+	log.Info("calling: ", nodeUrl)
 	resp, err := http.Post(nodeUrl, "application/json", bytes.NewBuffer(data))
 	if err != nil {
+		log.Error(err, "Failed while calling url", nodeUrl)
 		return err
 	}
-	fmt.Printf("Response for store key:%v and value:%v is %v", key, value, resp)
+	log.Info("Response for store key: ", key, "value: ", value, "resp: ", resp)
 	defer resp.Body.Close()
 	return nil
 }
 
 func getValue(key string) (string, error){
 	node := ring.GetNode(key)
+	if node == ""{
+		err := fmt.Errorf("Unable to get node for key %s", key)
+		log.Error(err, "Failed in getting node for key")
+		return "", err
+	}
 	nodeUrl := nodeTourlMaps[node] + "/get?key=" + key
+	log.Info("Calling : ", nodeUrl)
 	resp, err := http.Get(nodeUrl)
 	if err != nil {
 		return "", err
 	}
-	fmt.Printf("Response for store key:%v  is %v", key, resp)
+	// fmt.Printf("Response for store key:%v  is %v", key, resp)
 
 	defer resp.Body.Close()
 
 	body, _ := io.ReadAll(resp.Body)
-	fmt.Printf("getValue Body: %v", body)
+	log.Info("Resonse for key", key , "Value: ", string(body))
 	return string(body), nil
 }
 
