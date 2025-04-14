@@ -74,16 +74,18 @@ func (h *HashMap) Put(key string, value interface{}) error{
 		ind = (ind + 1 ) % len(h.table)
 		
 	}
+	return nil
 }
 
 func (h *HashMap) Get(key string) ([]byte, error){
 	hashVal := hash(key)
 	ind := int(hashVal) %  len(h.table) 
 	
-	curr := h.table[ind]
+	
 	dist := 0
 
 	for{
+		curr := h.table[ind]
 		if curr == nil{
 			err := fmt.Errorf("key %v not found", key)
 			return nil, err
@@ -149,5 +151,14 @@ func (h *HashMap) resize() {
 			json.Unmarshal(row.Value, &val)
 			h.Put(row.Key, val)
 		}
+	}
+}
+
+func (h *HashMap) PrintMap(){
+	for _, row := range h.table{
+		if row != nil {
+			fmt.Printf("key : %v  Distanve: %v  Tombstone: %v \n", row.Key, row.Dist, row.Tombstone)
+		}
+		
 	}
 }

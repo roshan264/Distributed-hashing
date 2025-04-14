@@ -19,8 +19,8 @@ func main() {
 	hm := robinhood.CreateNewHashMap(0.75, 16)
 
 	// Test data for Put and Get operations
-	for i := 0 ; i < 38 ; i++{
-		
+	for i := 0 ; i < 18 ; i++{
+
 		name := "Roshan" + strconv.Itoa(i)
 		age := i 
 		user := User{Name: name, Age: age}
@@ -31,7 +31,7 @@ func main() {
 		}
 	}
 
-	for i := 0 ; i < 38 ; i++{
+	for i := 0 ; i < 18 ; i++{
 
 		name := "Roshan" + strconv.Itoa(i)
 
