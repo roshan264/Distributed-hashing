@@ -27,7 +27,7 @@ func main(){
 	fmt.Printf("roshan")
 	http.HandleFunc("/set", handleSet)
 	http.HandleFunc("/get", handleGet)
-
+	http.HandleFunc("/delete", handleDelete)
 	port := "9001"
 	if len(os.Args) > 1 {
 		port = os.Args[1]
@@ -57,5 +57,17 @@ func handleGet(w http.ResponseWriter, r *http.Request){
 		http.NotFound(w, r)
 	}
 
-	fmt.Printf(key)
+}
+
+func handleDelete(w http.ResponseWriter, r *http.Request){
+	key := r.URL.Query().Get("key")
+	_, ok := store.Load(key)
+	if ok {
+		store.Delete(key)
+		fmt.Fprintf(w, "Deleted: %s", key)
+	} else {
+		fmt.Printf("Key: %v node not present", key)
+		http.NotFound(w, r)
+	}
+
 }
