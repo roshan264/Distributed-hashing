@@ -36,7 +36,7 @@ func hash(key string) uint32 {
 	return h.Sum32()
 }
 
-func (h *HashMap) putInternal(key string, value interface{}) error{
+func (h *HashMap) putInternal(key string, value interface{}, convertVal bool) error{
 	valueBytes, err := json.Marshal(value)
 
 	if err != nil{
@@ -82,7 +82,7 @@ func (h *HashMap) Put(key string, value interface{}) error{
 		h.resize()
 	}
 
-	return h.putInternal(key, value)
+	return h.putInternal(key, value, true)
 }
 
 func (h *HashMap) Get(key string) ([]byte, error){
@@ -163,9 +163,9 @@ func (h *HashMap) resize() {
 	for _, row := range oldTable {
 
 		if row != nil && !row.Tombstone {
-			var val interface{}
-			json.Unmarshal(row.Value, &val)
-			h.putInternal(row.Key, val)
+			// var val interface{}
+			// json.Unmarshal(row.Value, &val)
+			h.putInternal(row.Key, row.Value , false)
 		}
 	}
 }
