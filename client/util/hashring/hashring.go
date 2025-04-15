@@ -19,7 +19,7 @@ import(
 	"sync"
 	"strconv"
 	"crypto/sha256"
-	"distributed-hashing/util/logger"
+	"distributed-hashing/client/util/logger"
 )
 var virtualNodes int = 100
 

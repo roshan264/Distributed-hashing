@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"sync"
 
-	"distributed-hashing/hashmap/robinhood"
+	"distributed-hashing/server/hashmap/robinhood"
 )
 
 

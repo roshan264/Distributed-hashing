@@ -56,7 +56,7 @@ func UnitTesting(){
 			// fmt.Printf("without marshal: key: %v value: %+v\n", name, string(data))
 			val, _ := DecodeValue[User](data)
 
-			fmt.Printf("fetched : key: %v value: %v\n", name, val)
+			fmt.Printf("fetching for key: %v Name: %v value: %v\n", name, val.Name, val.Age)
 			// fmt.Printf("Print: name %v", val.Name)
 		}
 		go getKeyGoRountine(i)

@@ -8,8 +8,8 @@ import (
 	"io"
 	// "reflect"
 
-	"distributed-hashing/util/hashring"
-	"distributed-hashing/util/logger"
+	"distributed-hashing/client/util/hashring"
+	"distributed-hashing/client/util/logger"
 )
 
 var log = logger.InitLogger("/Users/StartupUser/Desktop/roshan-coding/log/client.log")

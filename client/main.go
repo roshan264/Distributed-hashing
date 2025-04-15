@@ -16,7 +16,7 @@ delete key same as above.*/
 package main
 
 import(
-	"distributed-hashing/util/logger"
+	"distributed-hashing/client/util/logger"
 	"distributed-hashing/client/methods"
 	"distributed-hashing/testing/test"
 )
