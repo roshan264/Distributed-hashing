@@ -1,7 +1,6 @@
 package test 
 
 import(
-	"distributed-hashing/util/hashring"
 	"fmt"
 	"strconv"
 	"sync"
@@ -22,7 +21,7 @@ func DecodeValue[T any](data []byte) (T, error) {
 	return t, err
 }
 
-func UnitTesting(ring *hashring.HashRing){
+func UnitTesting(){
 
 	var wg sync.WaitGroup
 
@@ -33,7 +32,7 @@ func UnitTesting(ring *hashring.HashRing){
 			name := "Roshan" + strconv.Itoa(i)
 			age := i 
 			user := User{Name: name, Age: age}
-			err := methods.SetKeyValue(name, user, ring)
+			err := methods.SetKeyValue(name, user)
 			fmt.Printf("post: key: %v value: %+v\n", name, age)
 			if err != nil {
 				log.Fatalf("Put failed: %v", err)
@@ -50,7 +49,7 @@ func UnitTesting(ring *hashring.HashRing){
 			defer wg.Done()
 			name := "Roshan" + strconv.Itoa(i)
 
-			data, err := methods.GetValue(name, ring)
+			data, err := methods.GetValue(name)
 			if err != nil {
 				fmt.Printf("Error while fetchi %v : %v", name, err)
 			}
@@ -72,7 +71,7 @@ func UnitTesting(ring *hashring.HashRing){
 			defer wg.Done()
 			name := "Roshan" + strconv.Itoa(i)
 
-			err := methods.DeleteKey(name, ring)
+			err := methods.DeleteKey(name)
 			if err != nil {
 				fmt.Printf("Error while deleting %v : %v", name, err)
 			}
@@ -92,7 +91,7 @@ func UnitTesting(ring *hashring.HashRing){
 			defer wg.Done()
 			name := "Roshan" + strconv.Itoa(i)
 
-			data, err := methods.GetValue(name, ring)
+			data, err := methods.GetValue(name)
 			if err != nil {
 				fmt.Printf("Error while fetching %v : %v", name, err)
 			}

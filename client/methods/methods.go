@@ -24,8 +24,17 @@ type keyValRequest struct {
 	Key   string `json:"key"`
 	Value interface{} `json:"value",omitempty`
 }
+var ring *hashring.HashRing
 
-func SetKeyValue(key string, value interface{}, ring *hashring.HashRing) error {
+func Setup() {
+
+	ring = hashring.CreateNewHashRing()	
+	for nodeName := range NodeTourlMaps{
+		ring.AddNode(nodeName)
+	}
+}
+
+func SetKeyValue(key string, value interface{}) error {
 	node := ring.GetNode(key)
 	nodeUrl := NodeTourlMaps[node] + "/set"
 
@@ -46,7 +55,7 @@ func SetKeyValue(key string, value interface{}, ring *hashring.HashRing) error {
 	return nil
 }
 
-func GetValue(key string, ring *hashring.HashRing) ([]byte, error){
+func GetValue(key string) ([]byte, error){
 	node := ring.GetNode(key)
 	if node == ""{
 		err := fmt.Errorf("Unable to get node for key %s", key)
@@ -110,7 +119,7 @@ func GetValue(key string, ring *hashring.HashRing) ([]byte, error){
 	}
 }
 
-func DeleteKey(key string, ring *hashring.HashRing) error {
+func DeleteKey(key string) error {
 	node := ring.GetNode(key)
 	if node == ""{
 		err := fmt.Errorf("Unable to get node for key %s", key)

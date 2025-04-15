@@ -16,24 +16,16 @@ delete key same as above.*/
 package main
 
 import(
-	"distributed-hashing/util/hashring"
 	"distributed-hashing/util/logger"
 	"distributed-hashing/client/methods"
 	"distributed-hashing/testing/test"
 )
 
-var ring *hashring.HashRing
 var log = logger.InitLogger("/Users/StartupUser/Desktop/roshan-coding/log/client.log")
 
 
 func main(){
-
-	ring = hashring.CreateNewHashRing()
-	
-	for nodeName := range methods.NodeTourlMaps{
-		ring.AddNode(nodeName)
-	}
-
-	test.UnitTesting(ring)
+	methods.Setup()
+	test.UnitTesting()
 }
 
