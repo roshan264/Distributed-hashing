@@ -164,9 +164,9 @@ func (h *HashMap) resize() {
 	for _, row := range oldTable {
 
 		if row != nil && !row.Tombstone {
-			// var val interface{}
-			// json.Unmarshal(row.Value, &val)
-			h.putInternal(row.Key, row.Value , false)
+			var val interface{}
+			json.Unmarshal(row.Value, &val)
+			h.putInternal(row.Key, val , false)
 		}
 	}
 }
