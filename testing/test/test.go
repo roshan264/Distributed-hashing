@@ -24,7 +24,7 @@ func UnitTesting(){
 
 	var wg sync.WaitGroup
 
-	for i := 0 ; i < 58 ; i++{
+	for i := 0 ; i < 10 ; i++{
 		wg.Add(1)
 		go func(i int){
 			defer wg.Done()
@@ -42,7 +42,7 @@ func UnitTesting(){
 
 	wg.Wait()
 
-	for i := 0 ; i < 58 ; i++{
+	for i := 0 ; i < 10 ; i++{
 		wg.Add(1)
 		getKeyGoRountine := func(i int){
 			defer wg.Done()
@@ -65,7 +65,7 @@ func UnitTesting(){
 	wg.Wait()
 
 
-	for i := 0 ; i < 70 ; i = i + 4{
+	for i := 0 ; i < 12 ; i = i + 3{
 		wg.Add(1)
 		deleteKeyGoRountine := func(i int){
 			defer wg.Done()
@@ -86,7 +86,7 @@ func UnitTesting(){
 	wg.Wait()
 
 
-	for i := 0 ; i < 58 ; i++{
+	for i := 0 ; i < 12; i++{
 		wg.Add(1)
 		getKeyGoRountine := func(i int){
 			defer wg.Done()

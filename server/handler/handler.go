@@ -140,7 +140,7 @@ func handleGet(w http.ResponseWriter, r *http.Request){
 		Result : make(chan interface{}),
 		Err : make(chan error),
 	}
-	fmt.Printf("Adding task in pool for getting key:%v \n", key)
+	LOG.Info(" for fetching", "key", key)
 	pool.AddTask(task)
 
 	select{
@@ -174,7 +174,7 @@ func handleDelete(w http.ResponseWriter, r *http.Request){
 		Result : make(chan interface{}),
 		Err : make(chan error),
 	}
-	fmt.Printf("Adding task in pool for deleting key:%v \n", key)
+	LOG.Info("Adding task in pool for deleting", "key", key)
 	pool.AddTask(task)
 
 	select{
