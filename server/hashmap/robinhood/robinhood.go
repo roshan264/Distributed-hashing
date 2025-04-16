@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"hash/fnv"
 	"encoding/json"
-)
 
+	"distributed-hashing/server/logger"
+)
+var LOG = logger.InitLogger("Logs/hashmap.log")
 
 func CreateNewHashMap(maxLoadFactor float64, defaultCapacity int) *HashMap{
 	hashMap := HashMap{
@@ -26,7 +28,7 @@ func (h *HashMap) putInternal(key string, value interface{}, convertVal bool) er
 	valueBytes, err := json.Marshal(value)
 
 	if err != nil{
-		fmt.Printf("Error while converting value to json bytes %v", err)
+		LOG.Error(err, "Error while converting value to json bytes")
 		return err
 	}
 
@@ -58,6 +60,8 @@ func (h *HashMap) putInternal(key string, value interface{}, convertVal bool) er
 		ind = (ind + 1 ) % len(h.table)
 		
 	}
+
+	LOG.Error(nil, "Execution should never reach here.")
 	return nil
 
 }
@@ -86,6 +90,7 @@ func (h *HashMap) Get(key string) ([]byte, error){
 		curr := h.table[ind]
 		if curr == nil{
 			err := fmt.Errorf("key %v not found", key)
+			LOG.Info(err.Error())
 			return nil, err
 		}
 
@@ -95,6 +100,7 @@ func (h *HashMap) Get(key string) ([]byte, error){
 
 		if dist > curr.Dist {
 			err := fmt.Errorf("key %v not found", key)
+			LOG.Info(err.Error())
 			return nil, err
 		}
 
@@ -117,6 +123,7 @@ func (h *HashMap) Delete(key string) error {
 		curr := h.table[ind]
 		if curr == nil{
 			err := fmt.Errorf("key %v not found", key)
+			LOG.Error(err, "")
 			return err
 		}
 
@@ -128,6 +135,7 @@ func (h *HashMap) Delete(key string) error {
 
 		if dist > curr.Dist {
 			err := fmt.Errorf("key %v not found", key)
+			LOG.Error(err, "")
 			return err
 		}
 
@@ -160,7 +168,7 @@ func (h *HashMap) resize() {
 func (h *HashMap) PrintMap(){
 	for _, row := range h.table{
 		if row != nil {
-			fmt.Printf("key : %v  Distanve: %v  Tombstone: %v \n", row.Key, row.Dist, row.Tombstone)
+			LOG.Info("key" , row.Key, "Distanve", row.Dist, "Tombstone", row.Tombstone)
 		}
 		
 	}

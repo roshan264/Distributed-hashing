@@ -4,7 +4,6 @@ import(
 	"fmt"
 	"strconv"
 	"sync"
-	"log"
 	"distributed-hashing/client/methods"
 	"encoding/json"
 )
@@ -33,9 +32,9 @@ func UnitTesting(){
 			age := i 
 			user := User{Name: name, Age: age}
 			err := methods.SetKeyValue(name, user)
-			fmt.Printf("post: key: %v value: %+v\n", name, age)
+			fmt.Printf("set: key: %v value: %+v\n", name, age)
 			if err != nil {
-				log.Fatalf("Put failed: %v", err)
+				fmt.Printf("Error while setting :key: %v: %v \n", name, err.Error())
 			}
 		}(i)
 		//go putKeyGoroutine (i)
@@ -51,12 +50,13 @@ func UnitTesting(){
 
 			data, err := methods.GetValue(name)
 			if err != nil {
-				fmt.Printf("Error while fetchi %v : %v", name, err)
+				fmt.Printf("%v\n", err.Error())
+				return
 			}
 			// fmt.Printf("without marshal: key: %v value: %+v\n", name, string(data))
 			val, _ := DecodeValue[User](data)
 
-			fmt.Printf("fetching for key: %v Name: %v value: %v\n", name, val.Name, val.Age)
+			fmt.Printf("fetching(After decoding to value format) for key: %v Name: %v value: %v\n", name, val.Name, val.Age)
 			// fmt.Printf("Print: name %v", val.Name)
 		}
 		go getKeyGoRountine(i)
@@ -73,10 +73,11 @@ func UnitTesting(){
 
 			err := methods.DeleteKey(name)
 			if err != nil {
-				fmt.Printf("Error while deleting %v : %v", name, err)
+				fmt.Printf("Error while deleting %v : %v \n", name, err)
+				return
 			}
 
-			fmt.Printf("delted key key: %v \n", name)
+			fmt.Printf("deleted key key: %v \n", name)
 			
 		}
 		go deleteKeyGoRountine(i)
@@ -93,12 +94,13 @@ func UnitTesting(){
 
 			data, err := methods.GetValue(name)
 			if err != nil {
-				fmt.Printf("Error while fetching %v : %v", name, err)
+				fmt.Printf("%v\n", err.Error())
+				return
 			}
 			// fmt.Printf("without marshal: key: %v value: %+v\n", name, string(data))
 			val, _ := DecodeValue[User](data)
 
-			fmt.Printf("Fetched key: %v value: %v\n", name, val)
+			fmt.Printf("Fetched(After decoding to value format) key: %v value: %v\n", name, val)
 			// fmt.Printf("Print: name %v", val.Name)
 		}
 		go getKeyGoRountine(i)

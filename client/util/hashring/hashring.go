@@ -29,7 +29,7 @@ type HashRing struct{
 	mutex sync.RWMutex
 }
 
-var log = logger.InitLogger("/Users/StartupUser/Desktop/roshan-coding/log/hashring.log")
+var LOG = logger.InitLogger("Logs/hashring.log")
 
 func CreateNewHashRing() *HashRing{
 	hashRing := HashRing{
@@ -47,14 +47,14 @@ func ConvertKeyToHash(key string) uint64{
 
 
 func (h *HashRing) AddNode(nodeName string){
-	log.Info("Adding:", "node",  nodeName)
+	LOG.Info("Adding:", "node",  nodeName)
 	
-	// log.Error(err, "Failed to connect", "host", "localhost", "port", 8080)
+	// LOG.Error(err, "Failed to connect", "host", "localhost", "port", 8080)
 
 	// Warning (using Info with custom tag as warning)
-	// log.Info("Warning: retrying connection", "attempt", 1)
+	// LOG.Info("Warning: retrying connection", "attempt", 1)
 
-	// log.Info("Connecting to server", "retry", 3)
+	// LOG.Info("Connecting to server", "retry", 3)
 	h.mutex.Lock()
 	defer h.mutex.Unlock()
 
@@ -68,7 +68,7 @@ func (h *HashRing) AddNode(nodeName string){
 	sort.Slice(h.sortedHashes, func(i, j int) bool{
 		return h.sortedHashes[i] < h.sortedHashes[j]
 	})
-	log.Info("Added ","node", nodeName)
+	LOG.Info("Added ","node", nodeName)
 }
 
 func FindTargetedNodeHash(sortedHashes []uint64, hashKey uint64) uint64 {
@@ -99,7 +99,7 @@ func FindTargetedNodeHash(sortedHashes []uint64, hashKey uint64) uint64 {
 	
 }
 func (h *HashRing) GetNode(key string) string{
-	log.Info("Get Node for ", "key", key)
+	LOG.Info("Get Node for ", "key", key)
 	h.mutex.RLock()
 	defer h.mutex.RUnlock()
 
@@ -111,7 +111,7 @@ func (h *HashRing) GetNode(key string) string{
 
 	targetedHash := FindTargetedNodeHash(h.sortedHashes, hashKey)
 
-	log.Info("Node for ", "key", key , "Node", h.nodes[targetedHash])
+	LOG.Info("Node for ", "key", key , "Node", h.nodes[targetedHash])
 	return h.nodes[targetedHash]
 
 }

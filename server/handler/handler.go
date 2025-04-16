@@ -7,7 +7,9 @@ import(
 	"encoding/json"
 	"sync"
 	"distributed-hashing/server/hashmap/robinhood"
+	"distributed-hashing/server/logger"
 )
+var LOG = logger.InitLogger("Logs/server.log")
 
 var store sync.Map
 var hm *robinhood.HashMap
@@ -83,7 +85,7 @@ func CreateHandler(port string){
 	http.HandleFunc("/delete", handleDelete)
 	address := ":" + port
 	fmt.Printf("Listening on address: %v", address)
-
+	LOG.Info("Listening on", "address", address)
 	log.Fatal(http.ListenAndServe(address, nil))
 }
 
@@ -92,10 +94,12 @@ func handleSet(w http.ResponseWriter, r *http.Request){
 	var req keyValRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
     if err != nil || req.Key == ""{
+		LOG.Error(err, "Invalid json or missing key", "key", req.Key)
         http.Error(w, "Invalid json or missing key", http.StatusBadRequest)
         return
     }
-	fmt.Printf("key:%v value:%v", req.Key, req.Value)
+	
+	LOG.Info("Storing", "key", req.Key)
 	//store.Store(req.Key, req.Value)
 	//craete task for this put req
 	// err = hm.Put(req.Key, req.Value)
@@ -108,14 +112,16 @@ func handleSet(w http.ResponseWriter, r *http.Request){
 		Err : make(chan error),
 	}
 
-	fmt.Printf("Adding task in pool for inserting key:%v and value:%v \n",req.Key, req.Value )
+	LOG.Info("Adding task in pool for inserting", "key", req.Key)
 	pool.AddTask(task)
 
 	select{
 	case <- task.Result:
+		LOG.Info("Key", req.Key, " is stored in hashmap")
 		w.WriteHeader(http.StatusCreated)
 	case err := <- task.Err:
 		http.Error(w, err.Error() , http.StatusInternalServerError)
+		LOG.Error(err, "Error while storing ", "key", req.Key)
 	}
 }
 
@@ -123,9 +129,11 @@ func handleGet(w http.ResponseWriter, r *http.Request){
 	key := r.URL.Query().Get("key")
 
 	if key == ""{
+		LOG.Error(nil, "missing key", "key", key)
         http.Error(w, "Missing key", http.StatusBadRequest)
         return
     }
+	LOG.Info("Fetchin", "key", key)
 	task := Task{
 		Operation : "GET",
 		Key : key,
@@ -142,10 +150,12 @@ func handleGet(w http.ResponseWriter, r *http.Request){
 			http.Error(w, fmt.Sprintf("Invalid JSON stored for key: %v", key), http.StatusInternalServerError)
 			return
 		}
+		LOG.Info("successfully got value from hashmap for ", "key", key)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(val)
 	case err := <- task.Err:
+		LOG.Error(err, "Error while Fetching ", "key", key)
 		http.Error(w, err.Error() , http.StatusInternalServerError)
 	}
 }
@@ -153,9 +163,11 @@ func handleGet(w http.ResponseWriter, r *http.Request){
 func handleDelete(w http.ResponseWriter, r *http.Request){
 	key := r.URL.Query().Get("key")
 	if key == ""{
+		LOG.Error(nil, "missing key", "key", key)
         http.Error(w, "Missing key", http.StatusBadRequest)
         return
     }
+	LOG.Info("Deleting", "key", key)
 	task := Task{
 		Operation : "DELETE",
 		Key : key,
@@ -167,9 +179,11 @@ func handleDelete(w http.ResponseWriter, r *http.Request){
 
 	select{
 	case result := <- task.Result:
+		LOG.Info("successfully deleted key from hashmap for ", "key", key)
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintf(w, " Deleted: key %v %s", key, result)
 	case err := <- task.Err:
+		LOG.Error(err, "Error while Deleting ", "key", key)
 		http.Error(w, err.Error() , http.StatusInternalServerError)
 	}
 
