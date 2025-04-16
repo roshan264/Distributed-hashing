@@ -4,22 +4,8 @@ import (
 	"fmt"
 	"hash/fnv"
 	"encoding/json"
-	"sync"
 )
-type entry struct {
-	Key string
-	Value []byte
-	Tombstone bool 
-	Dist int
-} 
 
-
-type HashMap struct{
-	table    []*entry
-	size int 
-	loadFactor float64
-	mutex sync.RWMutex
-}
 
 func CreateNewHashMap(maxLoadFactor float64, defaultCapacity int) *HashMap{
 	hashMap := HashMap{
