@@ -82,7 +82,7 @@ func (h *HashMap) Put(key string, value interface{}) error{
 		h.resize()
 	}
 
-	h.PrintMap()
+	// h.PrintMap()
 	return h.putInternal(key, value, true)
 }
 
