@@ -35,7 +35,7 @@ This is **distributed hashmap system** built across multiple servers.
 
 ## 🧪 How to Test
 
-Run the test file:
+1. Clone the repo. And run make command like below in repo directory. 
 
 ```bash
-go run testing/test/test.go
+make run-all
