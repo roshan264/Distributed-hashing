@@ -8,7 +8,7 @@ import(
 	"distributed-hashing/client/util/logger"
 	"distributed-hashing/client/methods"
 )
-var LOG = logger.InitLogger("Logs/server.log")
+var LOG = logger.InitLogger("Logs/client.log")
 
 
 var setCmd = `curl -X POST "http://localhost:9004/set?key=user123" \
