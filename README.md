@@ -39,3 +39,26 @@ This is **distributed hashmap system** built across multiple servers.
 
 ```bash
 make run-all
+
+# Set data
+curl -X POST "http://localhost:9004/set?key=user123" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "data": {
+               "name": "roshan",
+               "age": 25,
+               "tags": ["go", "dev"],
+               "meta": {
+                   "active": true,
+                   "lastLogin": "2024-12-01T12:34:56Z"
+               }
+           }
+         }'
+
+# Get data
+curl -X GET "http://localhost:9004/get?key=user123"
+
+# Delete data
+curl -X DELETE "http://localhost:9004/get?key=user123"
+
+
