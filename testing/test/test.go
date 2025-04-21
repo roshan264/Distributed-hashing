@@ -96,7 +96,7 @@ func UnitTesting(){
 			key := "user" + strconv.Itoa(i)
 			data, err := methods.GetValue(key)
 			if err != nil {
-				fmt.Printf("key %v not found\n", key)
+				fmt.Printf("key %v not found %v \n", key, err)
 				return
 			}
 			fmt.Printf("Fetched: key: %v value: %+v\n", key, string(data))

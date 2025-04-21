@@ -156,7 +156,7 @@ func handleGet(w http.ResponseWriter, r *http.Request){
 		w.Write(val)
 	case err := <- task.Err:
 		LOG.Error(err, "Error while Fetching ", "key", key)
-		http.Error(w, err.Error() , http.StatusInternalServerError)
+		http.Error(w, err.Error() , http.StatusNotFound)
 	}
 }
 
@@ -184,7 +184,7 @@ func handleDelete(w http.ResponseWriter, r *http.Request){
 		fmt.Fprintf(w, " Deleted: key %v %s", key, result)
 	case err := <- task.Err:
 		LOG.Error(err, "Error while Deleting ", "key", key)
-		http.Error(w, err.Error() , http.StatusInternalServerError)
+		http.Error(w, err.Error() , http.StatusNotFound)
 	}
 
 	// _, ok := store.Load(key)

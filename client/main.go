@@ -18,10 +18,18 @@ package main
 import(
 	"distributed-hashing/client/methods"
 	"distributed-hashing/testing/test"
+	"os"
+	"distributed-hashing/client/handler"
 )
 
 func main(){
 	methods.Setup()
 	test.UnitTesting()
+
+	port := "9004"
+	if len(os.Args) > 1 {
+		port = os.Args[1]
+	} 
+	handler.CreateHandler(port)
 }
 
